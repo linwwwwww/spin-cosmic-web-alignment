@@ -41,28 +41,13 @@ def costhetaa(massline,showG,w,v,halo):
         wwwa=www[poshf]#filament上halo对应的
         vwwa=vww[poshf]
         
-        
-        num=np.where(wwwa[:,0]>wwwa[:,1]) 
-        q=wwwa[num,1]
-        wwwa[num,1]=wwwa[num,0]
-        wwwa[num,0]=q
-        p=vwwa[num,1,:]
-        vwwa[num,1,:]=vwwa[num,0,:]
-        vwwa[num,0,:]=p
-        num=np.where(wwwa[:,1]>wwwa[:,2]) 
-        q=wwwa[num,1]
-        wwwa[num,1]=wwwa[num,2]
-        wwwa[num,2]=q
-        p=vwwa[num,1,:]
-        vwwa[num,1,:]=vwwa[num,2,:]
-        vwwa[num,2,:]=p
-        num=np.where(wwwa[:,0]>wwwa[:,1]) 
-        q=wwwa[num,1]
-        wwwa[num,1]=wwwa[num,0]
-        wwwa[num,0]=q
-        p=vwwa[num,1,:]
-        vwwa[num,1,:]=vwwa[num,0,:]
-        vwwa[num,0,:]=p
+        sort=np.argsort(wwwa)       
+        for i in range(256):
+            for j in range(256):
+                for k in range(256):
+                    a=wwwa[i,j,k]
+                    wwwa[i,j,k]=a[sort[i,j,k]]
+                    vwwa[i,j,k]=b[sort[i,j,k]]
         print(wwwa)
         vector=vwwa[:,0]
         
