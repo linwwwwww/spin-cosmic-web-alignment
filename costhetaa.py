@@ -29,26 +29,25 @@ def costhetaa(massline,showG,w,v,halo):
         showGww=showG[posround[:,0],posround[:,1],posround[:,2]]#取出halo的对应位置的值
         poshf=np.where(showGww==2)#在filament上的halo的序号
         fraction=(np.shape(poshf))[1]/len(posround)
-        
-        #高质量结果为0.4505569447601728
+        print(fraction)
 
         #取出在filament中相关的halo信息
         halof=halos[poshf]
-        posroundf=np.floor(halos["Pos"])
+        posroundf=np.rint(halof["Pos"])
+        posroundf=posroundf.astype(np.int16)
         
-        www=w[posround[:,0],posround[:,1],posround[:,2]]#halo对应的
-        vww=v[posround[:,0],posround[:,1],posround[:,2]]
-        wwwa=www[poshf]#filament上halo对应的
-        vwwa=vww[poshf]
         
-        sort=np.argsort(wwwa)       
-        for i in range(256):
-            for j in range(256):
-                for k in range(256):
-                    a=wwwa[i,j,k]
-                    wwwa[i,j,k]=a[sort[i,j,k]]
-                    vwwa[i,j,k]=b[sort[i,j,k]]
-        print(wwwa)
+        wwwa=w[posroundf[:,0],posroundf[:,1],posroundf[:,2]]#halo对应的
+        vwwa=v[posroundf[:,0],posroundf[:,1],posroundf[:,2]]
+
+        
+        sort=np.argsort(wwwa)
+        for j in range(len(wwwa)):
+            a=wwwa[j]
+            b=vwwa[j]
+            wwwa[j]=a[sort[j]]
+            vwwa[j]=b[sort[j]]
+
         vector=vwwa[:,0]
         
         spinvalues=np.sqrt(np.square(halof["Spin"][:,0])+(np.square(halof["Spin"][:,1]))+np.square(halof["Spin"][:,2]))
@@ -56,7 +55,12 @@ def costhetaa(massline,showG,w,v,halo):
         spiny=halof["Spin"][:,1]/spinvalues
         spinz=halof["Spin"][:,2]/spinvalues
         
+        vectorvalues=np.sqrt(np.square(vector[:,0])+(np.square(vector[:,1]))+np.square(vector[:,2]))
+        vector[:,0]=vector[:,0]/vectorvalues
+        vector[:,1]=vector[:,1]/vectorvalues
+        vector[:,2]=vector[:,2]/vectorvalues
         costheta=(vector[:,0]*spinx+vector[:,1]*spiny+vector[:,2]*spinz)
+        
         error[i]=np.std(costheta)/np.sqrt(len(costheta))
         y[i]=np.median(abs(costheta))
         #draw_histogram(abs(costheta))
@@ -67,5 +71,4 @@ def costhetaa(massline,showG,w,v,halo):
     #plt.title("eagle_halo_spin*$v_f$ Rs=1.36Mpc/h Threshold=0.0012 stellarmass")
     plt.errorbar(np.log10(x[0:-1]),y[0:-1],yerr=error[0:-1],fmt='o',ecolor='r',color='b',elinewidth=1,capsize=1)
     plt.ylim([0.4,0.6])
-    print(error)
     return y,error
