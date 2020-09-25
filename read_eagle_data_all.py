@@ -100,13 +100,11 @@ parttype=1
 cores = multiprocessing.cpu_count()
 
 def Jcompute(i):
-    print(i/len(mass))
-
+ 
     halop=parts_in_region(basePath,snapnum,parttype,pos[i],r200[i],['Coordinates','Velocity'])      
     halopr=halop['Coordinates']-pos[i]
     halopv=halop['Velocity']-Vel[i]
-    halop=halop[np.where(np.linalg.norm(halopr, ord = 2)<r200[i])]
-
+    
     r3d=np.sqrt(np.sum(halopr*halopr, axis = 1))
     halopr=halopr[np.where(r3d < r200[i]),:][0]
     halopv =halopv[np.where(r3d < r200[i]),:][0]
