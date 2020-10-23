@@ -8,6 +8,7 @@ def costhetaa(massline,showG,w,v,halo):
     y=np.zeros([len(massline)])
     error=np.zeros([len(massline)])
     for i in np.arange(len(massline)-1):
+        print(i)
         massmin=massline[i]       
         massmax=massline[i+1]
         num=(np.where((halo['Mass']>=massmin)&(halo['Mass']<massmax)))
@@ -27,6 +28,8 @@ def costhetaa(massline,showG,w,v,halo):
         #在filament中的halo占所有halo的概率
         showGww=showG[posround[:,0],posround[:,1],posround[:,2]]#取出halo的对应位置的值
         poshf=np.where(showGww==2)#在filament上的halo的序号
+        #fraction=(np.shape(poshf))[1]/len(posround)
+        #print(fraction)
 
         #取出在filament中相关的halo信息
         halof=halos[poshf]
@@ -59,7 +62,6 @@ def costhetaa(massline,showG,w,v,halo):
         costheta=(vector[:,0]*spinx+vector[:,1]*spiny+vector[:,2]*spinz)
         
         error[i]=np.std(costheta)/np.sqrt(len(costheta))
-        #y[i]=np.mean(abs(costheta))
         y[i]=np.median(abs(costheta))
         #draw_histogram(abs(costheta))
         
@@ -70,69 +72,3 @@ def costhetaa(massline,showG,w,v,halo):
     plt.errorbar(np.log10(x[0:-1]),y[0:-1],yerr=error[0:-1],fmt='o',ecolor='r',color='b',elinewidth=1,capsize=1)
     plt.ylim([0.4,0.6])
     return y,error
-
-def costhetaa_all(showG,w,v,halo):
-    posround=np.rint(halo["Pos"])
-
-    #四舍五入求halo的坐标
-    #posround=np.rint(halo["pos"])
-    posround[np.where(posround==500)]=499
-
-    posround=posround.astype(np.int16)
-
-    #在filament中的halo占所有halo的概率
-    showGww=showG[posround[:,0],posround[:,1],posround[:,2]]#取出halo的对应位置的值
-    poshf=np.where(showGww==2)#在filament上的halo的序号
-    #fraction=(np.shape(poshf))[1]/len(posround)
-    #print(fraction)
-
-    #取出在filament中相关的halo信息
-    halof=halo[poshf]
-    
-    numberhalo=len(halof)
-    binnum=np.floor(numberhalo/10)
-    
-    posroundf=np.rint(halof["Pos"])
-    posroundf=posroundf.astype(np.int16)
-
-
-    wwwa=w[posroundf[:,0],posroundf[:,1],posroundf[:,2]]#halo对应的
-    vwwa=v[posroundf[:,0],posroundf[:,1],posroundf[:,2]]
-
-
-    sort=np.argsort(wwwa)
-    for j in range(len(wwwa)):
-        a=wwwa[j]
-        b=vwwa[j]
-        wwwa[j]=a[sort[j]]
-        vwwa[j]=b[sort[j]]
-
-    vector=vwwa[:,0]
-
-    spinvalues=np.sqrt(np.square(halof["Spin"][:,0])+(np.square(halof["Spin"][:,1]))+np.square(halof["Spin"][:,2]))
-    spinx=halof["Spin"][:,0]/spinvalues
-    spiny=halof["Spin"][:,1]/spinvalues
-    spinz=halof["Spin"][:,2]/spinvalues
-
-    vectorvalues=np.sqrt(np.square(vector[:,0])+(np.square(vector[:,1]))+np.square(vector[:,2]))
-    vector[:,0]=vector[:,0]/vectorvalues
-    vector[:,1]=vector[:,1]/vectorvalues
-    vector[:,2]=vector[:,2]/vectorvalues
-    costheta=(vector[:,0]*spinx+vector[:,1]*spiny+vector[:,2]*spinz)
-    
-    numberhalo=len(halof)
-    binnum=np.floor(numberhalo/5)
-    binnum=binnum.astype(np.int16)
-    x=[]
-    y=[]
-    
-    sortmass=np.argsort(halof['Mass'])
-    halof=halof[sortmass]
-    costheta=costheta[sortmass]
-    for i in range(5):
-        mass=halof['Mass'][i*binnum:(i+1)*binnum]
-        x.append(np.mean(mass))
-        costhetaresult=costheta[i*binnum:(i+1)*binnum]
-        y.append(np.mean(abs(costhetaresult)))
-
-    return x,y
